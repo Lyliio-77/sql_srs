@@ -5,6 +5,7 @@ import duckdb
 import io
 
 
+## Déclaration des df
 # Boissons
 csv = """
 beverage,price
@@ -30,6 +31,18 @@ CROSS JOIN food_items
 """
 
 solution = duckdb.sql(answer).df()
+
+st.write("SQL SRS Spaced Repetition SQL practice")
+
+with st.sidebar:
+    option = st.selectbox(
+        "What would you like to review",
+        ("Joins","GroupBy","Windows Functions"),
+        index = None,
+        placeholder="Select a theme",
+    )
+    st.write("You selected:", option)
+
 
 st.header("Entrez votre code:")
 query = st.text_area(label="Votre code SQL ici",key="user_input")
