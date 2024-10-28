@@ -1,21 +1,23 @@
 # pylint: disable=missing-module-docstring # pour désactiver l'erreur pylint car notre code n'est pas un module
 
 # Imports des librairies
-import io
+# import io
+import ast
+
 import duckdb
-import pandas as pd
+# import pandas as pd
 import streamlit as st
 
-con = duckdb.connect(database="data/exercices_sql_tables.duckdb",read_only=False)
+con = duckdb.connect(database="data/exercices_sql_tables.duckdb", read_only=False)
 
-#solution_df = duckdb.sql(ANSWER_STR).df()
+# solution_df = duckdb.sql(ANSWER_STR).df()
 
 st.write("SQL SRS Spaced Repetition SQL practice")
 
 with st.sidebar:
     theme = st.selectbox(
         "What would you like to review",
-        ("cross_joins", "GroupBy", "Windows Functions"),
+        ("cross_joins", "GroupBy", "window_functions"),
         index=None,
         placeholder="Select a theme",
     )
@@ -26,9 +28,9 @@ with st.sidebar:
 
 st.header("Entrez votre code:")
 query = st.text_area(label="Votre code SQL ici", key="user_input")
-# if query:
-#     result = duckdb.sql(query).df()
-#     st.dataframe(result)
+if query:
+    result = con.execute(query).df()
+    st.dataframe(result)
 #
 #     # Test
 #     if len(result.columns) != len(solution_df.columns):
@@ -46,15 +48,17 @@ query = st.text_area(label="Votre code SQL ici", key="user_input")
 #         )
 #
 #
-# tab2, tab3 = st.tabs(["Tables", "Solution"])
-#
-# with tab2:
-#     st.write("Table : beverages")
-#     st.dataframe(beverages)
-#     st.write("Table : food_items")
-#     st.dataframe(food_items)
-#     st.write("Solution")
-#     st.dataframe(solution_df)
-#
-# with tab3:
-#     st.write(ANSWER_STR)
+tab2, tab3 = st.tabs(["Tables", "Solution"])
+
+with tab2:
+    exercise_tables = ast.literal_eval(exercise.loc[0, "tables"])
+    for table in exercise_tables:
+        st.write(f"table: {table}")
+        df_table = con.execute(f"SELECT * FROM {table}").df()
+        st.dataframe(df_table)
+
+with tab3:
+    exercise_name = exercise.loc[0, "exercise_name"]
+    with open(f"answers/{exercise_name}.sql","r") as f:
+        answer = f.read()
+    st.write(answer)
