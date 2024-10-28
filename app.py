@@ -1,9 +1,20 @@
 # pylint: disable=missing-module-docstring # pour désactiver l'erreur pylint car notre code n'est pas un module
+import logging
 
 # Imports des librairies
+import os
 import duckdb
 import pandas as pd
 import streamlit as st
+
+if "data" not in os.listdir():
+    logging.error(os.listdir())
+    logging.error("Création fichier data")
+    os.mkdir("data")
+
+if "exercices_sql_tables.duckdb" not in os.listdir("data"):
+    exec(open("init_db.py").read())
+
 
 con = duckdb.connect(database="data/exercices_sql_tables.duckdb", read_only=False)
 
